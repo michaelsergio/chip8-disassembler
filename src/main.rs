@@ -80,17 +80,17 @@ fn decode(b0: u8, b1: u8) -> String {
     else if opcode == 0xA { return format!("LD I, {:#X}", arg3(b0, b1)) }
     else if opcode == 0xB { return format!("JP V0, {:#X}", arg3(b0, b1)) }
     else if opcode == 0xC { return format!("RND V{:X}, RND & {:#X}", b0 & 0x0F, b1) }
-    else if opcode == 0xD { return format!("DRW V{:X} V{:X}, {:X}", x, y, n) }
+    else if opcode == 0xD { return format!("DRW V{:X} V{:X} {:X}", x, y, n) }
     else if opcode == 0xE { return format!("SKP V{:X}", x) }
     else if opcode == 0xF { 
         if b1 == 0x07 { return format!("LD V{}, DT", x) }
         if b1 == 0x0A { return format!("LD V{}, KEY", x) }
-        if b1 == 0x15 { return format!("LD DT, V{}", x) }
-        if b1 == 0x18 { return format!("LD, ST, V{}", x) }
-        if b1 == 0x1E { return format!("ADD I, V{}", x) }
-        if b1 == 0x29 { return format!("LD F, V{}", x) }
-        if b1 == 0x33 { return format!("LD BCD, V{}", x) }
-        if b1 == 0x55 { return format!("LD [I], V{}", x) }
+        if b1 == 0x15 { return format!("LD DT, V{:X}", x) }
+        if b1 == 0x18 { return format!("LD, ST, V{:X}", x) }
+        if b1 == 0x1E { return format!("ADD I, V{:X}", x) }
+        if b1 == 0x29 { return format!("LD F, V{:X}", x) }
+        if b1 == 0x33 { return format!("LD BCD, V{:X}", x) }
+        if b1 == 0x55 { return format!("LD [I], V{:X}", x) }
         if b1 == 0x65 { return format!("LD V{}, [I]", x) }
         else { return String::from("??")}
     }
