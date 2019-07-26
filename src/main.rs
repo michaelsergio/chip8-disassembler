@@ -90,7 +90,7 @@ fn decode(b0: u8, b1: u8) -> String {
         if b1 == 0x1E { return format!("ADD I, V{:X}", x) }
         if b1 == 0x29 { return format!("LD F, V{:X}", x) }
         if b1 == 0x33 { return format!("LD BCD, V{:X}", x) }
-        if b1 == 0x55 { return format!("LD [I], V{:X}", x) }
+        if b1 == 0x55 { return format!("LD [I], V{}", x) }
         if b1 == 0x65 { return format!("LD V{}, [I]", x) }
         else { return String::from("??")}
     }
