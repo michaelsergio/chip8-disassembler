@@ -32,6 +32,13 @@ fn main() {
     } else { read_default };
 
     let path = &args[args.len() - 1];
+    // check if file exist
+    let metadata = fs::metadata(path);
+    let is_file = metadata.map(|x| x.is_file());
+    if !is_file.unwrap_or(false) {
+        println!("Not a valid file");
+        return;
+    }
 
     let bytes = fs::read(path).unwrap();
 
