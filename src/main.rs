@@ -61,8 +61,11 @@ fn read_pair(bytes: &Vec<u8>, index: usize) {
     //println!("{:02x}", b1);
     // let opcode = decode(b0 >> 4);
     let opcode = decode(b0, b1);
-    let should_show_ascii = false;
-    if should_show_ascii {
+    let should_show_ascii = true;
+    if should_show_ascii 
+        && (b0 == b' ' || b0.is_ascii_alphanumeric()) 
+        && (b1 == b' ' || b1.is_ascii_alphanumeric()) 
+    {
         println!("{} \"{}{}\"", opcode, b0 as char, b1 as char);
     }
     else {
