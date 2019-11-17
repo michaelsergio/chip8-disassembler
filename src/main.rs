@@ -11,7 +11,7 @@ fn main() {
     let args: Vec<String> = env::args().collect();
     println!("{:?}", args);
     if args.len() < 3 {
-        println!("Usage: disasm ???? file");
+        println!("Usage: disasm [opts] file");
         return
     }
     let path = &args[2];
