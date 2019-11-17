@@ -10,11 +10,28 @@ use std::fs;
 fn main() {
     let args: Vec<String> = env::args().collect();
     println!("{:?}", args);
-    if args.len() < 3 {
+    if args.len() < 2 {
         println!("Usage: disasm [opts] file");
         return
     }
-    let path = &args[2];
+
+    let skip: usize = if args.len() > 2 {
+        let arg1 = &args[1];
+        if arg1.starts_with("0x") {
+            let hex = &arg1[2..];
+            usize::from_str_radix(hex, 16).unwrap_or(0)
+        } else {
+            arg1.parse().unwrap_or(0 as usize)
+        }
+    } else { 0 };
+
+    let read_default = 17;
+    let read_up_to = if args.len() > 3 {
+        let arg2 = &args[2];
+        arg2.parse().unwrap_or(read_default)
+    } else { read_default };
+
+    let path = &args[args.len() - 1];
 
     let bytes = fs::read(path).unwrap();
 
@@ -22,13 +39,18 @@ fn main() {
     let address_offset = 0x200;
 
     println!("decoding {}", path);
-    let read_up_to = 17;
-    let skip = 0; // Need to add a skip arg
     for i in 0..read_up_to {
-        if should_print_address {
-            print!("{:03x} ", (i * 4) + address_offset);
+
+        let read_addr = skip + (i*2);
+        if read_addr >= bytes.len() {
+            return
         }
-        read_pair(&bytes, skip + (i*2));
+
+        if should_print_address {
+            // print!("{:03x} ", (i * 4) + address_offset + skip);
+            print!("{:03x} ", address_offset + read_addr);
+        }
+        read_pair(&bytes, read_addr);
     }
 }
 
@@ -39,7 +61,13 @@ fn read_pair(bytes: &Vec<u8>, index: usize) {
     //println!("{:02x}", b1);
     // let opcode = decode(b0 >> 4);
     let opcode = decode(b0, b1);
-    println!("{}", opcode);
+    let should_show_ascii = false;
+    if should_show_ascii {
+        println!("{} \"{}{}\"", opcode, b0 as char, b1 as char);
+    }
+    else {
+        println!("{}", opcode);
+    }
 }
 
 fn decode(b0: u8, b1: u8) -> String {
