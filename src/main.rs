@@ -11,7 +11,7 @@ fn main() {
     let args: Vec<String> = env::args().collect();
     println!("{:?}", args);
     if args.len() < 2 {
-        println!("Usage: disasm [opts] file");
+        println!("Usage: disasm [skip|0xskip [read_amnt]] file");
         return
     }
 
