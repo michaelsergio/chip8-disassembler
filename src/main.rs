@@ -1,5 +1,37 @@
-use std::env;
 use std::fs;
+use std::path::PathBuf;
+use structopt::StructOpt;
+
+fn parse_hex(arg: &str) -> usize {
+        if arg.starts_with("0x") {
+            let hex = &arg[2..];
+            usize::from_str_radix(hex, 16).unwrap_or(0)
+        } else {
+            arg.parse().unwrap_or(0 as usize)
+        }
+}
+
+#[derive(StructOpt, Debug)]
+#[structopt(name = "chip8-disasm")]
+struct Opt {
+
+    #[structopt(short = "j", long = "skip", default_value = "0", parse(from_str = parse_hex))]
+    skip: usize,
+
+    // choices d|o|x|n
+    // #[structopt(short = "A", long = "base", parse(try_from_string = parse_base_option))]
+    // address: char,
+
+    #[structopt(short = "N", long = "length", default_value = "16")]
+    length: u32,
+
+    // #[structopt(short = "+", long = "offset")]
+    // offset: u32,
+
+    /// Files to process
+    #[structopt(name = "FILE", parse(from_os_str))]
+    file: PathBuf,
+}
 
 // Match args for od
 // -j XXX skip
@@ -8,47 +40,24 @@ use std::fs;
 // + offset 
 
 fn main() {
-    let args: Vec<String> = env::args().collect();
-    println!("{:?}", args);
-    if args.len() < 2 {
-        println!("Usage: disasm [skip|0xskip [read_amnt]] file");
-        return
-    }
+    let opt: Opt = Opt::from_args();
+    //println!("{:#?}", opt);
 
-    let skip: usize = if args.len() > 2 {
-        let arg1 = &args[1];
-        if arg1.starts_with("0x") {
-            let hex = &arg1[2..];
-            usize::from_str_radix(hex, 16).unwrap_or(0)
-        } else {
-            arg1.parse().unwrap_or(0 as usize)
-        }
-    } else { 0 };
-
-    let read_default = 17;
-    let read_up_to = if args.len() > 3 {
-        let arg2 = &args[2];
-        arg2.parse().unwrap_or(read_default)
-    } else { read_default };
-
-    let path = &args[args.len() - 1];
     // check if file exist
-    let metadata = fs::metadata(path);
-    let is_file = metadata.map(|x| x.is_file());
-    if !is_file.unwrap_or(false) {
+    if !opt.file.is_file() {
         println!("Not a valid file");
         return;
     }
 
-    let bytes = fs::read(path).unwrap();
+    println!("decoding {}", opt.file.to_str().unwrap_or("error"));
+    let bytes = fs::read(opt.file).unwrap();
 
     let should_print_address = true;
     let address_offset = 0x200;
 
-    println!("decoding {}", path);
-    for i in 0..read_up_to {
+    for i in 0..opt.length {
 
-        let read_addr = skip + (i*2);
+        let read_addr = opt.skip + (i as usize * 2);
         if read_addr >= bytes.len() {
             return
         }
